@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import api from "../Api/axiosInstance"; // ✅ axios instance
-import "./Login.css";
+import api from "../Api/axiosInstance"; 
 
 export default function Login() {
   const nav = useNavigate();
@@ -131,7 +130,7 @@ export default function Login() {
         toast.success("Faculty Login Successful 🎉");
 
         // 🔥 VERY IMPORTANT
-        localStorage.setItem("token", res.data.token); // ✅ SAVE TOKEN
+        localStorage.setItem("token", res.data.token); 
 
         localStorage.setItem(
           "user",

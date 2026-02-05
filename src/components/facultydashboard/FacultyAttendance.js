@@ -63,53 +63,58 @@ export default function FacultyAttendance({ faculty }) {
 
   // ================= SAVE ATTENDANCE =================
   const saveAttendance = async () => {
-    if (!batchCode) {
-      toast.error("No batch selected.");
-      return;
-    }
-    if (!markDate) {
-      toast.error("Please select date before saving attendance.");
-      return;
-    }
-    if (!topic || topic.trim().length === 0) {
-      toast.error("Please enter today's topic before saving.");
-      return;
-    }
+  if (!batchCode) {
+    toast.error("No batch selected.");
+    return;
+  }
 
-    const records = Object.keys(statusMap).map((id) => ({
-      studentId: id,
-      status: statusMap[id],
-    }));
+  if (!faculty || !faculty.id ) {
+    toast.error("Faculty information missing. Please login again.");
+    return;
+  }
 
-    const payload = {
-      batchCode,
-      facultyId: faculty?.id,
-      facultyCode: faculty?.facultyCode,
-      date: markDate,
-      topic: topic.trim(),
-      records,
-    };
+  if (!markDate) {
+    toast.error("Please select date.");
+    return;
+  }
 
-    try {
-      setSaving(true);
+  if (!topic.trim()) {
+    toast.error("Please enter today's topic.");
+    return;
+  }
 
-      const res = await api.post("/api/attendance/mark", payload);
-      const data = res.data;
+  const records = Object.keys(statusMap).map((id) => ({
+    studentId: id,
+    status: statusMap[id],
+  }));
 
-      if (data?.message === "ALREADY_SAVED") {
-        toast.error("Attendance already marked for this date!");
-        return;
-      }
-
-      toast.success("Attendance saved successfully!");
-      setTopic("");
-    } catch (err) {
-      console.error("saveAttendance error", err);
-      toast.error("Server error while saving attendance.");
-    } finally {
-      setSaving(false);
-    }
+  const payload = {
+    batchCode,
+    facultyId: faculty.id,          // ✅ guaranteed now
+        date: markDate,
+    topic: topic.trim(),
+    records,
   };
+
+  try {
+    setSaving(true);
+    const res = await api.post("/api/attendance/mark", payload);
+
+    if (res.data?.message === "ALREADY_SAVED") {
+      toast.error("Attendance already marked!");
+      return;
+    }
+
+    toast.success("Attendance saved successfully!");
+    setTopic("");
+  } catch (err) {
+    console.error(err);
+    toast.error("Server error while saving attendance.");
+  } finally {
+    setSaving(false);
+  }
+};
+
 
   // ================= UI STATES =================
   if (!batchCode) {
